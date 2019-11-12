@@ -1,0 +1,145 @@
+import { getManager, getRepository, In } from "typeorm";
+
+import { Maintenance } from "../models/Maintenance.model";
+import { Unit } from "../models/Unit.model";
+import { UnitService } from "./unit.service";
+
+interface ICreateMaintenanceData {
+  month: number;
+  year: number;
+  paidDate?: Date;
+  dueAmount: number;
+  paid: boolean;
+  unitId: string;
+}
+
+interface IPatchedMaintenanceData {
+  month?: number;
+  year?: number;
+  paidDate?: Date;
+  dueAmount?: number;
+  paid?: boolean;
+  unitId?: string;
+}
+
+export class MaintenanceService {
+  static async createMaintenance(
+    data: ICreateMaintenanceData
+  ): Promise<Maintenance> {
+    const manager = getManager();
+    const maintenance = new Maintenance();
+    maintenance.month = data.month;
+    maintenance.year = data.year;
+    maintenance.paidDate = data.paidDate;
+    maintenance.dueAmount = data.dueAmount;
+    maintenance.paid = data.paid;
+
+    const unit: Unit = await UnitService.getById(data.unitId);
+
+    if (!unit) {
+      throw new Error(`Unit ${data.unitId} doesn't exist.`);
+    }
+
+    maintenance.unit = unit;
+
+    const maintenanceByDate: Maintenance = await getRepository(
+      Maintenance
+    ).findOne({
+      where: {
+        month: data.month,
+        year: data.year,
+        deleted: false
+      }
+    });
+
+    if (maintenanceByDate) {
+      throw new Error(
+        `Period already registered date: ${data.month} ${data.year}.`
+      );
+    }
+
+    return manager.save(maintenance);
+  }
+
+  static getAll(): Promise<Maintenance[]> {
+    return getRepository(Maintenance).find({
+      where: {
+        deleted: false
+      },
+      relations: ["unit"]
+    });
+  }
+
+  static getById(id: string): Promise<Maintenance> {
+    return getRepository(Maintenance).findOne({
+      where: {
+        id,
+        deleted: false
+      },
+      relations: ["unit"]
+    });
+  }
+
+  static async patchMaintenance(
+    id: string,
+    data: IPatchedMaintenanceData
+  ): Promise<Maintenance> {
+    const manager = getManager();
+    const repository = getRepository(Maintenance);
+    const maintenance: Maintenance = await repository.findOne({
+      where: {
+        id,
+        deleted: false
+      }
+    });
+
+    if (!maintenance) {
+      throw new Error(`maintenance ${id} doesn't exists`);
+    }
+
+    maintenance.month = data.month;
+    maintenance.year = data.year;
+    maintenance.paidDate = data.paidDate;
+    maintenance.dueAmount = data.dueAmount;
+    maintenance.paid = data.paid;
+
+    if (data.unitId) {
+      const unit: Unit = await getRepository(Unit).findOne({
+        where: {
+          id: data.unitId,
+          deleted: false
+        }
+      });
+
+      if (!unit) {
+        throw new Error(`Unit ${data.unitId} doesn't exist.`);
+      }
+
+      maintenance.unit = unit;
+    }
+
+    return manager.save(maintenance);
+  }
+
+  static async deleteMaintenance(id: string): Promise<Maintenance> {
+    const repository = getRepository(Maintenance);
+    const maintenance: Maintenance = await repository.findOne({
+      where: {
+        id,
+        deleted: false
+      }
+    });
+    if (maintenance) {
+      maintenance.deleted = true;
+      maintenance.deletedAt = new Date();
+      return repository.save(maintenance);
+    }
+    return maintenance;
+  }
+
+  static async findByIdRange(ids: string[]): Promise<Maintenance[]> {
+    return getRepository(Maintenance).find({
+      id: In(ids)
+    });
+  }
+}
