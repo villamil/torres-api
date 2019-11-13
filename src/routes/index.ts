@@ -3,6 +3,7 @@ import { userRoute } from "./user.route";
 import { unitRoute } from "./unit.route";
 import { maintenanceRoute } from "./maintenance.route";
 import { waterRoute } from "./water.route";
+import { codeRoute } from "./code.route";
 
 interface IRoute {
   path: string;
@@ -24,6 +25,11 @@ export const routes: IRoute[] = [
   {
     path: "/units",
     handler: unitRoute,
+    middleware: []
+  },
+  {
+    path: "/codes",
+    handler: codeRoute,
     middleware: []
   },
   {

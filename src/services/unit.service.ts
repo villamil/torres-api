@@ -79,6 +79,15 @@ export class UnitService {
     });
   }
 
+  static getByCode(code: string): Promise<Unit> {
+    return getRepository(Unit).findOne({
+      where: {
+        signUpCode: code,
+        deleted: false
+      }
+    });
+  }
+
   static async patchUnit(id: string, data: IPatchedUnitData): Promise<Unit> {
     const manager = getManager();
     const repository = getRepository(Unit);

@@ -10,6 +10,12 @@ export class User extends BaseEntity {
   @Column()
   lastName!: string;
 
+  @Column()
+  email!: string;
+
+  @Column()
+  password!: string;
+
   @OneToMany(type => Unit, unit => unit.owner)
   unit!: Unit[];
 }

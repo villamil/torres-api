@@ -8,6 +8,8 @@ import {
   ManyToOne,
   JoinTable
 } from "typeorm";
+import * as randomString from "randomstring";
+
 import { BaseEntity } from "./BaseEntities/EntityBase";
 import { User } from "./User.model";
 import { Maintenance } from "./Maintenance.model";
@@ -23,6 +25,16 @@ export class Unit extends BaseEntity {
 
   @Column()
   reference!: number;
+
+  @Column({
+    unique: true,
+    default: () =>
+      `"${randomString.generate({
+        length: 7,
+        charset: "alphanumeric"
+      })}"`
+  })
+  signUpCode!: string;
 
   @ManyToOne(type => User, user => user.unit, { cascade: true })
   @JoinColumn()
