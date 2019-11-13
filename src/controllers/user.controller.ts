@@ -36,7 +36,12 @@ export class UserController {
       const user = await UserService.createUser(req.body);
       HttpResponse.success(res, user);
     } catch (error) {
-      HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
+      HttpResponse.fail(
+        res,
+        400,
+        10001,
+        error.message || JSON.stringify(error)
+      );
     }
   }
 

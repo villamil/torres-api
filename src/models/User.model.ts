@@ -15,7 +15,4 @@ export class User extends BaseEntity {
 
   @Column()
   password!: string;
-
-  @OneToMany(type => Unit, unit => unit.owner)
-  unit!: Unit[];
 }

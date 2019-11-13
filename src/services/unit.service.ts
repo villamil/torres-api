@@ -48,7 +48,7 @@ export class UnitService {
     if (data.owner) {
       const owner: User = await UserService.getById(data.owner);
       if (owner) {
-        unit.owner = owner;
+        unit.owners.push(owner);
       }
     }
 
@@ -65,7 +65,7 @@ export class UnitService {
       where: {
         deleted: false
       },
-      relations: ["tenants", "owner", "maintenance", "water"]
+      relations: ["tenants", "owners", "maintenance", "water"]
     });
   }
 
@@ -75,16 +75,22 @@ export class UnitService {
         id,
         deleted: false
       },
-      relations: ["tenants", "owner", "maintenance", "water"]
+      relations: ["tenants", "owners", "maintenance", "water"]
     });
   }
 
   static getByCode(code: string): Promise<Unit> {
     return getRepository(Unit).findOne({
-      where: {
-        signUpCode: code,
-        deleted: false
-      }
+      where: [
+        {
+          signUpCode: code,
+          deleted: false
+        },
+        {
+          ownerCode: code,
+          deleted: false
+        }
+      ]
     });
   }
 
@@ -127,16 +133,54 @@ export class UnitService {
     if (data.owner) {
       const owner: User = await UserService.getById(data.owner);
       if (owner) {
-        unit.owner = owner;
+        unit.owners.push(owner);
       }
     } else {
-      await getRepository(Unit).update({ id: unit.id }, { owner: null });
+      await getRepository(Unit).update({ id: unit.id }, { owners: null });
     }
 
     if (data.tenants) {
       const tenants: User[] = await UserService.findByIdRange(data.tenants);
       unit.tenants = tenants;
     }
+
+    return manager.save(unit);
+  }
+
+  static async addTenant(unitId: string, userId: string): Promise<Unit> {
+    const manager = getManager();
+    const unit = await UnitService.getById(unitId);
+
+    if (!unit) {
+      throw new Error(`Unit ${unitId} doesn't exists`);
+    }
+
+    const user = await UserService.getById(userId);
+
+    if (!user) {
+      throw new Error(`User ${userId} doesn't exists`);
+    }
+
+    unit.tenants.push(user);
+
+    return manager.save(unit);
+  }
+
+  static async addOwner(unitId: string, userId: string): Promise<Unit> {
+    const manager = getManager();
+    const unit = await UnitService.getById(unitId);
+
+    if (!unit) {
+      throw new Error(`Unit ${unitId} doesn't exists`);
+    }
+
+    const user = await UserService.getById(userId);
+
+    if (!user) {
+      throw new Error(`User ${userId} doesn't exists`);
+    }
+
+    unit.owners.push(user);
 
     return manager.save(unit);
   }

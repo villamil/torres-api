@@ -30,15 +30,25 @@ export class Unit extends BaseEntity {
     unique: true,
     default: () =>
       `"${randomString.generate({
-        length: 7,
+        length: 12,
         charset: "alphanumeric"
       })}"`
   })
   signUpCode!: string;
 
-  @ManyToOne(type => User, user => user.unit, { cascade: true })
-  @JoinColumn()
-  owner!: User;
+  @Column({
+    unique: true,
+    default: () =>
+      `"${randomString.generate({
+        length: 12,
+        charset: "alphanumeric"
+      })}"`
+  })
+  ownerCode!: string;
+
+  @ManyToMany(type => User)
+  @JoinTable()
+  owners!: User[];
 
   @OneToMany(type => Maintenance, maintenance => maintenance.unit)
   maintenance!: Maintenance[];
