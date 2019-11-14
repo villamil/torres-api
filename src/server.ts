@@ -4,12 +4,14 @@ import helmet from "helmet";
 import http from "http";
 import { Connection } from "typeorm";
 import bodyParser from "body-parser";
+import * as WebSocket from "ws";
 
 import { routes } from "./routes";
 import { ErrorHandling } from "./controllers/errorHandling.controller";
 import { connectDB } from "./db";
 
 export class Server {
+  public wss: WebSocket;
   private readonly app: express.Application;
   private readonly server: http.Server | undefined;
   private connection: Connection | undefined;
@@ -17,6 +19,7 @@ export class Server {
   constructor() {
     this.app = express();
     this.server = http.createServer(this.app);
+    this.wss = new WebSocket.Server({ server: this.server, path: "/status" });
   }
 
   public async start(): Promise<http.Server | undefined> {

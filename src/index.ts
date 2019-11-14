@@ -10,6 +10,9 @@ import { CONFIG } from "./config";
     startedServer.on("listening", () => {
       console.log(`Server listening on port ${CONFIG.PORT}`);
     });
+    server.wss.on("connection", async (ws, req) => {
+      console.log("new websocket connection");
+    });
   } catch (error) {
     console.log(error);
     throw new Error("Couldn't create server");
