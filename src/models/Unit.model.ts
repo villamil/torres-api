@@ -50,10 +50,16 @@ export class Unit extends BaseEntity {
   @JoinTable()
   owners!: User[];
 
-  @OneToMany(type => Maintenance, maintenance => maintenance.unit)
+  @OneToMany(
+    type => Maintenance,
+    maintenance => maintenance.unit
+  )
   maintenance!: Maintenance[];
 
-  @OneToMany(type => Water, water => water.unit)
+  @OneToMany(
+    type => Water,
+    water => water.unit
+  )
   water!: Water[];
 
   @ManyToMany(type => User)

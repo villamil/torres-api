@@ -94,6 +94,26 @@ export class UnitService {
     });
   }
 
+  static getByTenant(userId: string): Promise<Unit[]> {
+    return getRepository(Unit)
+      .createQueryBuilder("unit")
+      .innerJoinAndSelect("unit.tenants", "tenant", "tenant.id = :tenantId", {
+        tenantId: userId
+      })
+      .leftJoinAndSelect("unit.maintenance", "maintenance")
+      .getMany();
+  }
+
+  static getByOwner(userId: string): Promise<Unit[]> {
+    return getRepository(Unit)
+      .createQueryBuilder("unit")
+      .innerJoinAndSelect("unit.owners", "owner", "owner.id = :ownerId", {
+        ownerId: userId
+      })
+      .leftJoinAndSelect("unit.maintenance", "maintenance")
+      .getMany();
+  }
+
   static async patchUnit(id: string, data: IPatchedUnitData): Promise<Unit> {
     const manager = getManager();
     const repository = getRepository(Unit);

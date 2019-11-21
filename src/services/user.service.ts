@@ -130,6 +130,34 @@ export class UserService {
     });
   }
 
+  static async getUserMetadata(userId: string): Promise<any> {
+    const userOwnedUnits = await UnitService.getByOwner(userId);
+    const userTenantUnits = await UnitService.getByTenant(userId);
+
+    const units = [];
+    let isOwner = false;
+    let defaultUnit;
+
+    if (userOwnedUnits.length) {
+      isOwner = true;
+      defaultUnit = { ...userOwnedUnits[0] };
+      units.push(...userOwnedUnits);
+    }
+
+    if (userTenantUnits.length) {
+      if (!isOwner) {
+        defaultUnit = { ...userTenantUnits[0] };
+      }
+      units.push(...userTenantUnits);
+    }
+
+    return {
+      isOwner,
+      units,
+      defaultUnit
+    };
+  }
+
   private static generateHash(plainText): Promise<string> {
     return new Promise((resolve, reject) => {
       bcrypt.hash(plainText, 10, (err, hash) => {
