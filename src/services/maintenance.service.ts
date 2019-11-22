@@ -48,13 +48,14 @@ export class MaintenanceService {
       where: {
         month: data.month,
         year: data.year,
+        unit: data.unitId,
         deleted: false
       }
     });
 
     if (maintenanceByDate) {
       throw new Error(
-        `Period already registered date: ${data.month} ${data.year}.`
+        `Period for maintenance already registered date: ${data.month} ${data.year}.`
       );
     }
 
@@ -141,5 +142,19 @@ export class MaintenanceService {
     return getRepository(Maintenance).find({
       id: In(ids)
     });
+  }
+
+  static async totalOwed(unitId): Promise<number> {
+    const maintenance = await getRepository(Maintenance).find({
+      where: {
+        unit: unitId,
+        paid: false,
+        deleted: false
+      }
+    });
+
+    return maintenance.reduce((acum, current) => {
+      return acum + current.dueAmount;
+    }, 0);
   }
 }

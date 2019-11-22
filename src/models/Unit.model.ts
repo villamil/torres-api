@@ -1,14 +1,15 @@
 import {
   Column,
   Entity,
-  JoinColumn,
+  Generated,
   OneToMany,
   OneToOne,
   ManyToMany,
   ManyToOne,
   JoinTable
 } from "typeorm";
-import * as randomString from "randomstring";
+
+import { v4 as uuid } from "uuid";
 
 import { BaseEntity } from "./BaseEntities/EntityBase";
 import { User } from "./User.model";
@@ -26,24 +27,12 @@ export class Unit extends BaseEntity {
   @Column()
   reference!: number;
 
-  @Column({
-    unique: true,
-    default: () =>
-      `"${randomString.generate({
-        length: 12,
-        charset: "alphanumeric"
-      })}"`
-  })
+  @Column({ unique: true })
+  @Generated("uuid")
   signUpCode!: string;
 
-  @Column({
-    unique: true,
-    default: () =>
-      `"${randomString.generate({
-        length: 12,
-        charset: "alphanumeric"
-      })}"`
-  })
+  @Column({ unique: true })
+  @Generated("uuid")
   ownerCode!: string;
 
   @ManyToMany(type => User)

@@ -50,6 +50,7 @@ export class WaterService {
       where: {
         month: data.month,
         year: data.year,
+        unit: data.unitId,
         deleted: false
       }
     });
@@ -142,5 +143,19 @@ export class WaterService {
     return getRepository(Water).find({
       id: In(ids)
     });
+  }
+
+  static async totalOwed(unitId): Promise<number> {
+    const water = await getRepository(Water).find({
+      where: {
+        unit: unitId,
+        paid: false,
+        deleted: false
+      }
+    });
+
+    return water.reduce((acum, current) => {
+      return acum + current.dueAmount;
+    }, 0);
   }
 }
