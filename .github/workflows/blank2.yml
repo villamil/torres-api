@@ -1,0 +1,15 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: TypeScript Container Action Template
+      uses: kevinpollet/typescript-container-action-template@v1
+      with:
+        # Name to greet
+        name: Luis
