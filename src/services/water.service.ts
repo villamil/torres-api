@@ -166,4 +166,13 @@ export class WaterService {
 
     return totalDueAndPaidAmount.due - totalDueAndPaidAmount.paid;
   }
+
+  static async getByUnit(unitId: string): Promise<Water[]> {
+    return getRepository(Water).find({
+      where: {
+        unit: unitId,
+        deleted: false
+      }
+    });
+  }
 }

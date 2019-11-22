@@ -19,7 +19,7 @@ export class WaterController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const water = await WaterService.getById(req.params.id);
+      const water = await WaterService.getByUnit(req.params.id);
       HttpResponse.success(res, water);
     } catch (error) {
       HttpResponse.fail(

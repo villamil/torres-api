@@ -146,7 +146,7 @@ export class MaintenanceService {
     });
   }
 
-  static async totalOwed(unitId): Promise<number> {
+  static async totalOwed(unitId: string): Promise<number> {
     const maintenance = await getRepository(Maintenance).find({
       where: {
         unit: unitId,
@@ -164,5 +164,14 @@ export class MaintenanceService {
     );
 
     return totalDueAndPaidAmount.due - totalDueAndPaidAmount.paid;
+  }
+
+  static async getByUnit(unitId: string): Promise<Maintenance[]> {
+    return getRepository(Maintenance).find({
+      where: {
+        unit: unitId,
+        deleted: false
+      }
+    });
   }
 }
