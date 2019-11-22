@@ -65,7 +65,7 @@ export class UnitService {
       where: {
         deleted: false
       },
-      relations: ["tenants", "owners", "maintenance", "water"]
+      relations: ["tenants", "owners"]
     });
   }
 
@@ -75,7 +75,7 @@ export class UnitService {
         id,
         deleted: false
       },
-      relations: ["tenants", "owners", "maintenance", "water"]
+      relations: ["tenants", "owners"]
     });
   }
 

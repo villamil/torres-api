@@ -75,6 +75,9 @@ export class TestData {
           month: x,
           year: 2019,
           dueAmount: 700,
+          paidAmount: isPaid
+            ? TestData.randomInt(700, 750)
+            : TestData.randomInt(0, 700),
           paid: isPaid,
           unitId: unit.id,
           paidDate: isPaid ? new Date() : null
@@ -92,10 +95,14 @@ export class TestData {
     for (const unit of units) {
       for (let x = 1; x <= 12; x++) {
         const isPaid = Math.random() >= 0.5;
+        const dueAmount = TestData.randomInt(60, 200);
         multipleWater.push({
           month: x,
           year: 2019,
-          dueAmount: TestData.randomInt(60, 200),
+          dueAmount,
+          paidAmount: isPaid
+            ? TestData.randomInt(dueAmount, 250)
+            : TestData.randomInt(0, dueAmount),
           paid: isPaid,
           unitId: unit.id,
           paidDate: isPaid ? new Date() : null,

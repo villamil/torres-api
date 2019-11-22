@@ -8,6 +8,7 @@ interface ICreateMaintenanceData {
   month: number;
   year: number;
   paidDate?: Date;
+  paidAmount?: number;
   dueAmount: number;
   paid: boolean;
   unitId: string;
@@ -33,6 +34,7 @@ export class MaintenanceService {
     maintenance.paidDate = data.paidDate;
     maintenance.dueAmount = data.dueAmount;
     maintenance.paid = data.paid;
+    maintenance.paidAmount = data.paidAmount;
 
     const unit: Unit = await UnitService.getById(data.unitId);
 
@@ -148,13 +150,19 @@ export class MaintenanceService {
     const maintenance = await getRepository(Maintenance).find({
       where: {
         unit: unitId,
-        paid: false,
         deleted: false
       }
     });
 
-    return maintenance.reduce((acum, current) => {
-      return acum + current.dueAmount;
-    }, 0);
+    const totalDueAndPaidAmount = maintenance.reduce(
+      (acum, current) => {
+        acum.due += current.dueAmount;
+        acum.paid += current.paidAmount;
+        return acum;
+      },
+      { due: 0, paid: 0 }
+    );
+
+    return totalDueAndPaidAmount.due - totalDueAndPaidAmount.paid;
   }
 }

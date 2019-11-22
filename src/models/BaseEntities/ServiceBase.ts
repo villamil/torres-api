@@ -20,6 +20,9 @@ export abstract class ServiceBase extends BaseEntity {
   @Column()
   dueAmount!: number;
 
+  @Column({ default: 0 })
+  paidAmount!: number;
+
   @Column()
   paid!: boolean;
 
