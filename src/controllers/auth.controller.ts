@@ -22,7 +22,10 @@ export class AuthController {
       };
 
       const token = await AuthService.signToken(payload, user.email);
-      HttpResponse.success(res, { token, metadata: { ...userMetadata } });
+      HttpResponse.success(res, {
+        token,
+        metadata: { ...userMetadata, ...payload }
+      });
     } catch (error) {
       HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
     }

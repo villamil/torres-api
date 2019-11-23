@@ -164,7 +164,7 @@ export class WaterService {
       { due: 0, paid: 0 }
     );
 
-    return totalDueAndPaidAmount.due - totalDueAndPaidAmount.paid;
+    return totalDueAndPaidAmount.paid - totalDueAndPaidAmount.due;
   }
 
   static async getByUnit(unitId: string): Promise<Water[]> {
@@ -172,6 +172,9 @@ export class WaterService {
       where: {
         unit: unitId,
         deleted: false
+      },
+      order: {
+        month: "ASC"
       }
     });
   }
