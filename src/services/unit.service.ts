@@ -220,4 +220,26 @@ export class UnitService {
     }
     return unit;
   }
+
+  static async removeUser(userId: string, unitId: string): Promise<Unit> {
+    const repository = getRepository(Unit);
+    const unit = await UnitService.getById(unitId);
+    unit.tenants = unit.tenants.filter(tenant => tenant.id !== userId);
+
+    unit.owners = unit.owners.filter(owner => owner.id !== userId);
+    return repository.save(unit);
+  }
+
+  static async changeUserPermission(
+    userId: string,
+    unitId: string,
+    makeAdmin: boolean
+  ): Promise<Unit> {
+    await UnitService.removeUser(userId, unitId);
+    if (makeAdmin) {
+      return UnitService.addOwner(unitId, userId);
+    } else {
+      return UnitService.addTenant(unitId, userId);
+    }
+  }
 }

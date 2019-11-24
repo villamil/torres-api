@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { HttpResponse } from "../utils/httpResponse";
 
 import { UserService } from "../services/user.service";
+import { UnitService } from "../services/unit.service";
 
 export class UserController {
   static async getAll(req: Request, res: Response) {
@@ -47,8 +48,24 @@ export class UserController {
 
   static async deleteUser(req: Request, res: Response) {
     try {
-      const user = await UserService.deleteUser(req.params.id);
-      HttpResponse.success(res, user);
+      const unit = await UnitService.removeUser(
+        req.params.userId,
+        req.params.unitId
+      );
+      HttpResponse.success(res, unit);
+    } catch (error) {
+      HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
+    }
+  }
+
+  static async changeUserPermission(req: Request, res: Response) {
+    try {
+      const unit = await UnitService.changeUserPermission(
+        req.params.userId,
+        req.params.unitId,
+        req.body.makeAdmin
+      );
+      HttpResponse.success(res, unit);
     } catch (error) {
       HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
     }

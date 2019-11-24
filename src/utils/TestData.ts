@@ -56,6 +56,34 @@ export class TestData {
         email: "villamil_two@hotmail.com",
         password: "1234",
         code: firstUnit.signUpCode
+      },
+      {
+        firstName: "Juan",
+        lastName: "Perez",
+        email: "villamil_three@hotmail.com",
+        password: "1234",
+        code: firstUnit.signUpCode
+      },
+      {
+        firstName: "Israel",
+        lastName: "Hernandez",
+        email: "villamil_four@hotmail.com",
+        password: "1234",
+        code: firstUnit.signUpCode
+      },
+      {
+        firstName: "Hector",
+        lastName: "Ibarra",
+        email: "villamil_five@hotmail.com",
+        password: "1234",
+        code: firstUnit.signUpCode
+      },
+      {
+        firstName: "Fernando",
+        lastName: "Arzua",
+        email: "villamil_six@hotmail.com",
+        password: "1234",
+        code: firstUnit.signUpCode
       }
     ];
     const createdUsers = [];

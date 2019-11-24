@@ -6,4 +6,5 @@ export const userRoute: Router = Router()
   .get("/:id", UserController.getById)
   .patch("/:id", UserController.patchUser)
   .post("/", UserController.createUser)
-  .delete("/:id", UserController.deleteUser);
+  .delete("/:userId/unit/:unitId", UserController.deleteUser)
+  .post("/:userId/unit/:unitId", UserController.changeUserPermission);
