@@ -2,6 +2,7 @@ import { getManager, getRepository, In } from "typeorm";
 import * as bcrypt from "bcrypt";
 
 import { User } from "../models/User.model";
+import { UserUnit } from "../models/UserUnit.model";
 import { UnitService } from "./unit.service";
 
 interface ICreateUserData {
@@ -51,11 +52,13 @@ export class UserService {
 
       const newUser = await manager.save(user);
 
-      if (unit.ownerCode === data.code) {
-        await UnitService.addOwner(unit.id, user.id);
-      } else {
-        await UnitService.addTenant(unit.id, user.id);
-      }
+      const userUnit = new UserUnit();
+
+      userUnit.unit = unit;
+      userUnit.user = newUser;
+      userUnit.isOwner = unit.ownerCode === data.code;
+
+      await manager.save(userUnit);
 
       return newUser;
     } catch (error) {
@@ -131,25 +134,11 @@ export class UserService {
   }
 
   static async getUserMetadata(userId: string): Promise<any> {
-    const userOwnedUnits = await UnitService.getByOwner(userId);
-    const userTenantUnits = await UnitService.getByTenant(userId);
+    const userUnits: any = await UnitService.getByUser(userId);
 
-    const units = [];
-    let isOwner = false;
-    let defaultUnit;
-
-    if (userOwnedUnits.length) {
-      isOwner = true;
-      defaultUnit = { ...userOwnedUnits[0] };
-      units.push(...userOwnedUnits);
-    }
-
-    if (userTenantUnits.length) {
-      if (!isOwner) {
-        defaultUnit = { ...userTenantUnits[0] };
-      }
-      units.push(...userTenantUnits);
-    }
+    const units = [...userUnits];
+    const isOwner = userUnits[0].userUnit[0].isOwner;
+    const defaultUnit = userUnits[0];
 
     return {
       isOwner,

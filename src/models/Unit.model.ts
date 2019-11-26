@@ -15,6 +15,7 @@ import { BaseEntity } from "./BaseEntities/EntityBase";
 import { User } from "./User.model";
 import { Maintenance } from "./Maintenance.model";
 import { Water } from "./Water.model";
+import { UserUnit } from "./UserUnit.model";
 
 @Entity()
 export class Unit extends BaseEntity {
@@ -35,10 +36,6 @@ export class Unit extends BaseEntity {
   @Generated("uuid")
   ownerCode!: string;
 
-  @ManyToMany(type => User)
-  @JoinTable()
-  owners!: User[];
-
   @OneToMany(
     type => Maintenance,
     maintenance => maintenance.unit
@@ -51,7 +48,9 @@ export class Unit extends BaseEntity {
   )
   water!: Water[];
 
-  @ManyToMany(type => User)
-  @JoinTable()
-  tenants!: User[];
+  @OneToMany(
+    type => UserUnit,
+    userUnit => userUnit.unit
+  )
+  userUnit!: UserUnit[];
 }

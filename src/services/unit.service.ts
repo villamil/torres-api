@@ -5,6 +5,7 @@ import { User } from "../models/User.model";
 import { Maintenance } from "../models/Maintenance.model";
 
 import { UserService } from "../services/user.service";
+import { UserUnit } from "../models/UserUnit.model";
 
 interface ICreateUnitData {
   number: number;
@@ -31,7 +32,6 @@ export class UnitService {
     unit.number = data.number;
     unit.section = data.section;
     unit.reference = data.reference;
-    unit.tenants = [];
 
     const unitExists: Unit = await getRepository(Unit).findOne({
       where: {
@@ -45,18 +45,6 @@ export class UnitService {
       throw new Error(`Unit ${data.number}${data.section} already exists`);
     }
 
-    if (data.owner) {
-      const owner: User = await UserService.getById(data.owner);
-      if (owner) {
-        unit.owners.push(owner);
-      }
-    }
-
-    if (data.tenants) {
-      const tenants: User[] = await UserService.findByIdRange(data.tenants);
-      unit.tenants = tenants;
-    }
-
     return manager.save(unit);
   }
 
@@ -64,18 +52,17 @@ export class UnitService {
     return getRepository(Unit).find({
       where: {
         deleted: false
-      },
-      relations: ["tenants", "owners"]
+      }
     });
   }
 
-  static getById(id: string): Promise<Unit> {
+  static getById(unitId: string): Promise<Unit> {
     return getRepository(Unit).findOne({
       where: {
-        id,
+        id: unitId,
         deleted: false
       },
-      relations: ["tenants", "owners"]
+      relations: ["userUnit", "userUnit.user"]
     });
   }
 
@@ -94,21 +81,12 @@ export class UnitService {
     });
   }
 
-  static getByTenant(userId: string): Promise<Unit[]> {
+  static getByUser(userId: string): Promise<Unit[]> {
     return getRepository(Unit)
       .createQueryBuilder("unit")
-      .innerJoinAndSelect("unit.tenants", "tenant", "tenant.id = :tenantId", {
-        tenantId: userId
-      })
-      .leftJoinAndSelect("unit.maintenance", "maintenance")
-      .getMany();
-  }
-
-  static getByOwner(userId: string): Promise<Unit[]> {
-    return getRepository(Unit)
-      .createQueryBuilder("unit")
-      .innerJoinAndSelect("unit.owners", "owner", "owner.id = :ownerId", {
-        ownerId: userId
+      .innerJoinAndSelect("unit.userUnit", "userUnit")
+      .innerJoinAndSelect("userUnit.user", "user", "user.id = :userId", {
+        userId
       })
       .leftJoinAndSelect("unit.maintenance", "maintenance")
       .getMany();
@@ -127,7 +105,6 @@ export class UnitService {
     unit.section = data.section || unit.section;
     unit.reference = data.reference || unit.reference;
     unit.updatedAt = new Date();
-    unit.tenants = [];
 
     if (!unit) {
       throw new Error(`Unit ${id} doesn't exists`);
@@ -150,24 +127,14 @@ export class UnitService {
       }
     }
 
-    if (data.owner) {
-      const owner: User = await UserService.getById(data.owner);
-      if (owner) {
-        unit.owners.push(owner);
-      }
-    } else {
-      await getRepository(Unit).update({ id: unit.id }, { owners: null });
-    }
-
-    if (data.tenants) {
-      const tenants: User[] = await UserService.findByIdRange(data.tenants);
-      unit.tenants = tenants;
-    }
-
     return manager.save(unit);
   }
 
-  static async addTenant(unitId: string, userId: string): Promise<Unit> {
+  static async addUser(
+    unitId: string,
+    userId: string,
+    isOwner: boolean
+  ): Promise<Unit> {
     const manager = getManager();
     const unit = await UnitService.getById(unitId);
 
@@ -181,26 +148,12 @@ export class UnitService {
       throw new Error(`User ${userId} doesn't exists`);
     }
 
-    unit.tenants.push(user);
+    const userUnit = new UserUnit();
+    userUnit.unit = unit;
+    userUnit.user = user;
+    userUnit.isOwner = isOwner;
 
-    return manager.save(unit);
-  }
-
-  static async addOwner(unitId: string, userId: string): Promise<Unit> {
-    const manager = getManager();
-    const unit = await UnitService.getById(unitId);
-
-    if (!unit) {
-      throw new Error(`Unit ${unitId} doesn't exists`);
-    }
-
-    const user = await UserService.getById(userId);
-
-    if (!user) {
-      throw new Error(`User ${userId} doesn't exists`);
-    }
-
-    unit.owners.push(user);
+    await manager.save(userUnit);
 
     return manager.save(unit);
   }
@@ -224,9 +177,7 @@ export class UnitService {
   static async removeUser(userId: string, unitId: string): Promise<Unit> {
     const repository = getRepository(Unit);
     const unit = await UnitService.getById(unitId);
-    unit.tenants = unit.tenants.filter(tenant => tenant.id !== userId);
 
-    unit.owners = unit.owners.filter(owner => owner.id !== userId);
     return repository.save(unit);
   }
 
@@ -235,11 +186,17 @@ export class UnitService {
     unitId: string,
     makeAdmin: boolean
   ): Promise<Unit> {
-    await UnitService.removeUser(userId, unitId);
-    if (makeAdmin) {
-      return UnitService.addOwner(unitId, userId);
-    } else {
-      return UnitService.addTenant(unitId, userId);
-    }
+    const manager = getManager();
+    const repository = getRepository(UserUnit);
+    const userUnit = await repository.findOne({
+      where: {
+        userId,
+        unitId
+      }
+    });
+
+    userUnit.isOwner = makeAdmin;
+    await manager.save(userUnit);
+    return UnitService.getById(unitId);
   }
 }
