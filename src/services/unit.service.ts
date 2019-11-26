@@ -57,13 +57,14 @@ export class UnitService {
   }
 
   static getById(unitId: string): Promise<Unit> {
-    return getRepository(Unit).findOne({
-      where: {
-        id: unitId,
-        deleted: false
-      },
-      relations: ["userUnit", "userUnit.user"]
-    });
+    return getRepository(Unit)
+      .createQueryBuilder("unit")
+      .innerJoinAndSelect("unit.userUnit", "userUnit")
+      .innerJoinAndSelect("userUnit.unit", "usrUnit", "usrUnit.id = :unitId", {
+        unitId
+      })
+      .where("userUnit.deleted = false")
+      .getOne();
   }
 
   static getByCode(code: string): Promise<Unit> {
@@ -89,6 +90,7 @@ export class UnitService {
         userId
       })
       .leftJoinAndSelect("unit.maintenance", "maintenance")
+      .where("userUnit.deleted = false")
       .getMany();
   }
 
@@ -155,7 +157,7 @@ export class UnitService {
 
     await manager.save(userUnit);
 
-    return manager.save(unit);
+    return unit;
   }
 
   static async deleteUnit(id: string): Promise<Unit> {
@@ -175,10 +177,21 @@ export class UnitService {
   }
 
   static async removeUser(userId: string, unitId: string): Promise<Unit> {
-    const repository = getRepository(Unit);
-    const unit = await UnitService.getById(unitId);
+    const repository = getRepository(UserUnit);
+    const userUnit = await repository.findOne({
+      where: {
+        userId,
+        unitId,
+        deleted: false
+      }
+    });
 
-    return repository.save(unit);
+    userUnit.deleted = true;
+    userUnit.deletedAt = new Date();
+
+    await repository.save(userUnit);
+
+    return UnitService.getById(unitId);
   }
 
   static async changeUserPermission(
@@ -191,7 +204,8 @@ export class UnitService {
     const userUnit = await repository.findOne({
       where: {
         userId,
-        unitId
+        unitId,
+        deleted: false
       }
     });
 

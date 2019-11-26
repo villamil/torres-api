@@ -89,8 +89,10 @@ export class TestData {
     const createdUsers = [];
     for (const user of users) {
       const createdUser = await UserService.createUser(user);
+      await UnitService.addUser(secondUnit.id, createdUser.id, true);
       createdUsers.push(createdUser);
     }
+
     return createdUsers;
   }
 
