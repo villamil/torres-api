@@ -45,29 +45,4 @@ export class UserController {
       );
     }
   }
-
-  static async deleteUser(req: Request, res: Response) {
-    try {
-      const unit = await UnitService.removeUser(
-        req.params.userId,
-        req.params.unitId
-      );
-      HttpResponse.success(res, unit);
-    } catch (error) {
-      HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
-    }
-  }
-
-  static async changeUserPermission(req: Request, res: Response) {
-    try {
-      const unit = await UnitService.changeUserPermission(
-        req.params.userId,
-        req.params.unitId,
-        req.body.makeAdmin
-      );
-      HttpResponse.success(res, unit);
-    } catch (error) {
-      HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
-    }
-  }
 }

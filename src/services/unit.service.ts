@@ -57,12 +57,28 @@ export class UnitService {
   }
 
   static getById(unitId: string): Promise<Unit> {
+    return getRepository(Unit).findOne({
+      where: [
+        {
+          id: unitId,
+          deleted: false
+        }
+      ]
+    });
+  }
+
+  static getUnitAndUsersById(unitId: string): Promise<Unit> {
     return getRepository(Unit)
       .createQueryBuilder("unit")
       .innerJoinAndSelect("unit.userUnit", "userUnit")
-      .innerJoinAndSelect("userUnit.unit", "usrUnit", "usrUnit.id = :unitId", {
-        unitId
-      })
+      .innerJoinAndSelect(
+        "userUnit.user",
+        "user",
+        "userUnit.unit.id = :unitId",
+        {
+          unitId
+        }
+      )
       .where("userUnit.deleted = false")
       .getOne();
   }
@@ -176,14 +192,13 @@ export class UnitService {
     return unit;
   }
 
-  static async removeUser(userId: string, unitId: string): Promise<Unit> {
+  static async removeUser(userUnitId: string): Promise<Unit> {
     const repository = getRepository(UserUnit);
     const userUnit = await repository.findOne({
       where: {
-        userId,
-        unitId,
-        deleted: false
-      }
+        id: userUnitId
+      },
+      relations: ["unit"]
     });
 
     userUnit.deleted = true;
@@ -191,26 +206,25 @@ export class UnitService {
 
     await repository.save(userUnit);
 
-    return UnitService.getById(unitId);
+    return UnitService.getUnitAndUsersById(userUnit.unit.id);
   }
 
   static async changeUserPermission(
-    userId: string,
-    unitId: string,
+    id: string,
     makeAdmin: boolean
   ): Promise<Unit> {
     const manager = getManager();
     const repository = getRepository(UserUnit);
     const userUnit = await repository.findOne({
       where: {
-        userId,
-        unitId,
+        id,
         deleted: false
-      }
+      },
+      relations: ["unit"]
     });
 
     userUnit.isOwner = makeAdmin;
     await manager.save(userUnit);
-    return UnitService.getById(unitId);
+    return UnitService.getUnitAndUsersById(userUnit.unit.id);
   }
 }

@@ -62,36 +62,37 @@ export class TestData {
         lastName: "Perez",
         email: "villamil_three@hotmail.com",
         password: "1234",
-        code: firstUnit.signUpCode
+        code: secondUnit.ownerCode
       },
       {
         firstName: "Israel",
         lastName: "Hernandez",
         email: "villamil_four@hotmail.com",
         password: "1234",
-        code: firstUnit.signUpCode
+        code: secondUnit.signUpCode
       },
       {
         firstName: "Hector",
         lastName: "Ibarra",
         email: "villamil_five@hotmail.com",
         password: "1234",
-        code: firstUnit.signUpCode
+        code: secondUnit.signUpCode
       },
       {
         firstName: "Fernando",
         lastName: "Arzua",
         email: "villamil_six@hotmail.com",
         password: "1234",
-        code: firstUnit.signUpCode
+        code: secondUnit.signUpCode
       }
     ];
     const createdUsers = [];
     for (const user of users) {
       const createdUser = await UserService.createUser(user);
-      await UnitService.addUser(secondUnit.id, createdUser.id, true);
       createdUsers.push(createdUser);
     }
+
+    await UnitService.addUser(units[1].id, createdUsers[0].id, true);
 
     return createdUsers;
   }
@@ -115,34 +116,55 @@ export class TestData {
       }
     }
 
-    for (const maintenance of multipleMaintenance) {
-      await MaintenanceService.createMaintenance(maintenance);
+    for (const manintenance of multipleMaintenance) {
+      await MaintenanceService.createMaintenance(manintenance);
     }
   }
 
   static async createWater(units: Unit[]): Promise<void> {
-    const multipleWater = [];
-    for (const unit of units) {
-      for (let x = 1; x <= 12; x++) {
-        const isPaid = Math.random() >= 0.5;
-        const dueAmount = TestData.randomInt(60, 200);
-        multipleWater.push({
-          month: x,
-          year: 2019,
-          dueAmount,
-          paidAmount: isPaid
-            ? TestData.randomInt(dueAmount, 250)
-            : TestData.randomInt(0, dueAmount),
-          paid: isPaid,
-          unitId: unit.id,
-          paidDate: isPaid ? new Date() : null,
-          previuslyMesured: TestData.randomInt(200, 400),
-          currentMesured: TestData.randomInt(200, 400)
-        });
-      }
+    const multipleWaterOne = [];
+    const multipleWaterTwo = [];
+
+    for (let x = 1; x <= 12; x++) {
+      const isPaid = Math.random() >= 0.5;
+      const dueAmount = TestData.randomInt(60, 200);
+      multipleWaterOne.push({
+        month: x,
+        year: 2019,
+        dueAmount,
+        paidAmount: isPaid
+          ? TestData.randomInt(dueAmount, 250)
+          : TestData.randomInt(0, dueAmount),
+        paid: isPaid,
+        unitId: units[0].id,
+        paidDate: isPaid ? new Date() : null,
+        previuslyMesured: TestData.randomInt(200, 400),
+        currentMesured: TestData.randomInt(200, 400)
+      });
     }
 
-    for (const water of multipleWater) {
+    for (let x = 1; x <= 12; x++) {
+      const isPaid = Math.random() >= 0.5;
+      const dueAmount = TestData.randomInt(60, 200);
+      multipleWaterTwo.push({
+        month: x,
+        year: 2019,
+        dueAmount,
+        paidAmount: isPaid
+          ? TestData.randomInt(dueAmount, 250)
+          : TestData.randomInt(0, dueAmount),
+        paid: isPaid,
+        unitId: units[1].id,
+        paidDate: isPaid ? new Date() : null,
+        previuslyMesured: TestData.randomInt(200, 400),
+        currentMesured: TestData.randomInt(200, 400)
+      });
+    }
+
+    for (const water of multipleWaterOne) {
+      await WaterService.createWater(water);
+    }
+    for (const water of multipleWaterTwo) {
       await WaterService.createWater(water);
     }
   }

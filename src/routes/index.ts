@@ -5,6 +5,7 @@ import { maintenanceRoute } from "./maintenance.route";
 import { waterRoute } from "./water.route";
 import { codeRoute } from "./code.route";
 import { authRoute } from "./auth.route";
+import { userUnitRoute } from "./userUnit.route";
 
 interface IRoute {
   path: string;
@@ -26,6 +27,11 @@ export const routes: IRoute[] = [
   {
     path: "/users",
     handler: userRoute,
+    middleware: []
+  },
+  {
+    path: "/user-unit",
+    handler: userUnitRoute,
     middleware: []
   },
   {

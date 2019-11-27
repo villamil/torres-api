@@ -21,7 +21,7 @@ export class UnitController {
         req.params.id
       );
       const totalWaterOwed = await WaterService.totalOwed(req.params.id);
-      const unit = await UnitService.getById(req.params.id);
+      const unit = await UnitService.getUnitAndUsersById(req.params.id);
       HttpResponse.success(res, {
         ...unit,
         totalMaintenanceOwed,
