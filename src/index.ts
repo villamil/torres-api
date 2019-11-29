@@ -8,7 +8,8 @@ import { TestData } from "./utils/TestData";
     const startedServer = await server.start();
     if (!startedServer) throw Error("Error server");
     startedServer.listen(CONFIG.PORT);
-    // await TestData.createData();
+    // await TestData.clearOldData();
+    // await TestData.addUserToUnits();
     startedServer.on("listening", () => {
       console.log(`Server listening on port ${CONFIG.PORT}`);
     });

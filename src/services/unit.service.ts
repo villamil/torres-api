@@ -11,6 +11,7 @@ interface ICreateUnitData {
   number: number;
   section: string;
   reference: number;
+  ownerCode?: string;
   owner?: string;
   maintenance?: Maintenance[];
   tenants?: string[];
@@ -32,6 +33,7 @@ export class UnitService {
     unit.number = data.number;
     unit.section = data.section;
     unit.reference = data.reference;
+    unit.ownerCode = data.ownerCode;
 
     const unitExists: Unit = await getRepository(Unit).findOne({
       where: {
@@ -42,7 +44,7 @@ export class UnitService {
     });
 
     if (unitExists) {
-      throw new Error(`Unit ${data.number}${data.section} already exists`);
+      return unitExists;
     }
 
     return manager.save(unit);
@@ -105,7 +107,6 @@ export class UnitService {
       .innerJoinAndSelect("userUnit.user", "user", "user.id = :userId", {
         userId
       })
-      .leftJoinAndSelect("unit.maintenance", "maintenance")
       .where("userUnit.deleted = false")
       .getMany();
   }

@@ -56,9 +56,9 @@ export class MaintenanceService {
     });
 
     if (maintenanceByDate) {
-      throw new Error(
-        `Period for maintenance already registered date: ${data.month} ${data.year}.`
-      );
+      maintenanceByDate.paid = data.paid;
+      maintenanceByDate.paidAmount = data.paidAmount;
+      return manager.save(maintenanceByDate);
     }
 
     return manager.save(maintenance);

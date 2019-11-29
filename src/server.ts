@@ -5,6 +5,7 @@ import http from "http";
 import { Connection } from "typeorm";
 import bodyParser from "body-parser";
 import * as WebSocket from "ws";
+import fileupload from "express-fileupload";
 
 import { routes } from "./routes";
 import { ErrorHandling } from "./controllers/errorHandling.controller";
@@ -36,6 +37,12 @@ export class Server {
   }
 
   private initExpressApp(): void {
+    this.app.use(
+      fileupload({
+        useTempFiles: true,
+        tempFileDir: "/tmp/"
+      })
+    );
     this.app.use(helmet());
     this.app.use(
       cors({

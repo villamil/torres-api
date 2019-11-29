@@ -9,6 +9,40 @@ import { MaintenanceService } from "../services/maintenance.service";
 import { WaterService } from "../services/water.service";
 
 export class TestData {
+  static async addUserToUnits() {
+    const units = [
+      {
+        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
+        unitId: "a1d24b54-d02c-47a6-a313-c3081ba11e02",
+        isAdmin: true
+      },
+      {
+        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
+        unitId: "75b83c2a-ad39-42db-961a-b575a1bc49f5",
+        isAdmin: true
+      },
+      {
+        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
+        unitId: "d6fd8e42-ac6c-4a40-bb0f-f1de510f0a61",
+        isAdmin: true
+      },
+      {
+        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
+        unitId: "9e94f2be-4657-4171-9688-169a0eecdac4",
+        isAdmin: true
+      },
+      {
+        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
+        unitId: "4f055ce4-d656-4f76-a573-f90496a58c8e",
+        isAdmin: true
+      }
+    ];
+
+    for (const unit of units) {
+      await UnitService.addUser(unit.unitId, unit.userId, unit.isAdmin);
+    }
+  }
+
   static async createData() {
     await TestData.clearOldData();
     const createdUnits: Unit[] = await TestData.createUnits();

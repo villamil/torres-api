@@ -17,7 +17,7 @@ export abstract class ServiceBase extends BaseEntity {
   @Column()
   year!: number;
 
-  @Column()
+  @Column({ default: 0 })
   dueAmount!: number;
 
   @Column({ default: 0 })

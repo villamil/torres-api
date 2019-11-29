@@ -4,12 +4,15 @@ import { Unit } from "./Unit.model";
 
 @Entity()
 export class Water extends ServiceBase {
-  @Column()
+  @Column({ default: 0 })
   previuslyMesured!: number;
 
-  @Column()
+  @Column({ default: 0 })
   currentMesured!: number;
 
-  @ManyToOne(type => Unit, unit => unit.water)
+  @ManyToOne(
+    type => Unit,
+    unit => unit.water
+  )
   unit!: Unit;
 }

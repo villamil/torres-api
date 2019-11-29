@@ -12,8 +12,8 @@ interface ICreateWaterData {
   dueAmount: number;
   paid: boolean;
   unitId: string;
-  previuslyMesured: number;
-  currentMesured: number;
+  previuslyMesured?: number;
+  currentMesured?: number;
 }
 
 interface IPatchedWaterData {
@@ -58,9 +58,10 @@ export class WaterService {
     });
 
     if (waterByDate) {
-      throw new Error(
-        `Period already registered date: ${data.month} ${data.year}.`
-      );
+      waterByDate.paid = data.paid;
+      waterByDate.paidAmount = data.paidAmount;
+      waterByDate.dueAmount = data.dueAmount;
+      return manager.save(waterByDate);
     }
 
     return manager.save(water);
