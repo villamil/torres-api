@@ -166,15 +166,22 @@ export class MaintenanceService {
     return totalDueAndPaidAmount.paid - totalDueAndPaidAmount.due;
   }
 
-  static async getByUnit(unitId: string): Promise<Maintenance[]> {
-    return getRepository(Maintenance).find({
+  static async getByUnit(
+    unitId: string,
+    limit: number
+  ): Promise<Maintenance[]> {
+    const baseQuery: any = {
       where: {
         unit: unitId,
         deleted: false
       },
       order: {
-        month: "ASC"
+        month: "DESC"
       }
-    });
+    };
+    if (limit) {
+      baseQuery.take = limit;
+    }
+    return getRepository(Maintenance).find(baseQuery);
   }
 }

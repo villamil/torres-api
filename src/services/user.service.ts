@@ -136,14 +136,12 @@ export class UserService {
   static async getUserMetadata(userId: string): Promise<any> {
     const userUnits: any = await UnitService.getByUser(userId);
 
-    const units = [...userUnits];
     const isOwner = userUnits[0].userUnit[0].isOwner;
-    const defaultUnit = userUnits[0];
+    const defaultUnitId = userUnits[0].id;
 
     return {
       isOwner,
-      units,
-      defaultUnit
+      defaultUnitId
     };
   }
 

@@ -4,6 +4,15 @@ import { HttpResponse } from "../utils/httpResponse";
 import { UnitService } from "../services/unit.service";
 
 export class UserUnitController {
+  static async getUserUnit(req: Request, res: Response) {
+    try {
+      const units = await UnitService.getUnitsByUser(req.params.id);
+      HttpResponse.success(res, units);
+    } catch (error) {
+      HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
+    }
+  }
+
   static async changeUserPermission(req: Request, res: Response) {
     try {
       const unit = await UnitService.changeUserPermission(

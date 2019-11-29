@@ -100,6 +100,17 @@ export class UnitService {
     });
   }
 
+  static getUnitsByUser(userId: string): Promise<Unit[]> {
+    return getRepository(Unit)
+      .createQueryBuilder("unit")
+      .innerJoin("unit.userUnit", "userUnit")
+      .innerJoin("userUnit.user", "user", "user.id = :userId", {
+        userId
+      })
+      .where("userUnit.deleted = false")
+      .getMany();
+  }
+
   static getByUser(userId: string): Promise<Unit[]> {
     return getRepository(Unit)
       .createQueryBuilder("unit")

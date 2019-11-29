@@ -168,15 +168,19 @@ export class WaterService {
     return totalDueAndPaidAmount.paid - totalDueAndPaidAmount.due;
   }
 
-  static async getByUnit(unitId: string): Promise<Water[]> {
-    return getRepository(Water).find({
+  static async getByUnit(unitId: string, limit: number): Promise<Water[]> {
+    const baseQuery: any = {
       where: {
         unit: unitId,
         deleted: false
       },
       order: {
-        month: "ASC"
+        month: "DESC"
       }
-    });
+    };
+    if (limit) {
+      baseQuery.take = limit;
+    }
+    return getRepository(Water).find(baseQuery);
   }
 }

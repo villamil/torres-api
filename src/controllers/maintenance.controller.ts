@@ -19,7 +19,10 @@ export class MaintenanceController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const maintenance = await MaintenanceService.getByUnit(req.params.id);
+      const maintenance = await MaintenanceService.getByUnit(
+        req.params.id,
+        req.query.limit
+      );
       HttpResponse.success(res, maintenance);
     } catch (error) {
       HttpResponse.fail(

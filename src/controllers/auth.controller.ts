@@ -18,13 +18,14 @@ export class AuthController {
         userId: user.id,
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        defaultUnitId: userMetadata.defaultUnitId,
+        isOwner: userMetadata.isOwner
       };
 
       const token = await AuthService.signToken(payload, user.email);
       HttpResponse.success(res, {
-        token,
-        metadata: { ...userMetadata, ...payload }
+        token
       });
     } catch (error) {
       HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
