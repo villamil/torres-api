@@ -31,4 +31,4 @@ COPY --from=build /usr/src/dist .
 
 EXPOSE 8080
 
-CMD node .
+CMD ["node", "."]
