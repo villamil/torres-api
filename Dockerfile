@@ -20,10 +20,15 @@ ENV PORT=8080
 
 WORKDIR /server
 
-COPY --from=build /usr/src/dist .
+COPY package.json .
+COPY package-lock.json .
 
-WORKDIR /server
+RUN apk --no-cache add --virtual builds-deps build-base python
+
+RUN npm install
+
+COPY --from=build /usr/src/dist .
 
 EXPOSE 8080
 
-# CMD node src
+CMD node .
