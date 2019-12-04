@@ -3,7 +3,7 @@ import { CONFIG } from "./config";
 import { MysqlConnectionOptions } from "typeorm/driver/mysql/MysqlConnectionOptions";
 
 export async function connectDB(
-  entity: string
+  entity?: string
 ): Promise<Connection | undefined> {
   console.log(__dirname);
   const options: MysqlConnectionOptions = {
@@ -12,7 +12,7 @@ export async function connectDB(
     port: CONFIG.DB_PORT,
     username: CONFIG.DB_USER,
     password: CONFIG.DB_PASSWORD,
-    database: entity,
+    database: CONFIG.DB_NAME || entity,
     entities: [`${__dirname}/models/**{.ts,.js}`],
     synchronize: CONFIG.DB_SYNC,
     cli: {

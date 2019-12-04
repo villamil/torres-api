@@ -26,7 +26,7 @@ export class Server {
   public async start(): Promise<http.Server | undefined> {
     try {
       this.initExpressApp();
-      this.connection = await connectDB("homefeed-test");
+      this.connection = await connectDB();
       for (const route of routes) {
         this.app.use(route.path, route.middleware, route.handler);
       }
