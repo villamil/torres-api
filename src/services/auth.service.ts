@@ -1,6 +1,7 @@
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as fs from "fs";
+import * as path from "path";
 
 import { CONFIG } from "../config";
 import { UserService } from "./user.service";
@@ -19,7 +20,12 @@ export class AuthService {
   }
 
   static signToken(payload: any, subject: string): string {
-    const PRIVATE_KEY = fs.readFileSync(CONFIG.JWT_PRIVATE_KEY, "utf8").trim();
+    const PRIVATE_KEY = fs
+      .readFileSync(
+        path.join(__dirname, "../../", CONFIG.JWT_PRIVATE_KEY),
+        "utf8"
+      )
+      .trim();
 
     const options: jwt.SignOptions = {
       expiresIn: CONFIG.JWT_EXPIRATION,
@@ -32,7 +38,12 @@ export class AuthService {
   }
 
   static verifyToken(token: string): Promise<any> {
-    const PUBLIC_KEY = fs.readFileSync(CONFIG.JWT_PUBLIC_KEY, "utf8").trim();
+    const PUBLIC_KEY = fs
+      .readFileSync(
+        path.join(__dirname, "../../", CONFIG.JWT_PRIVATE_KEY),
+        "utf8"
+      )
+      .trim();
 
     return jwt.verify(token, PUBLIC_KEY);
   }
