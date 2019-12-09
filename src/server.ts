@@ -10,6 +10,7 @@ import fileupload from "express-fileupload";
 import { routes } from "./routes";
 import { ErrorHandling } from "./controllers/errorHandling.controller";
 import { connectDB } from "./db";
+import { CONFIG } from "./config";
 
 export class Server {
   public wss: WebSocket;
@@ -26,7 +27,8 @@ export class Server {
   public async start(): Promise<http.Server | undefined> {
     try {
       this.initExpressApp();
-      this.connection = await connectDB();
+      console.log(CONFIG);
+      // this.connection = await connectDB();
       for (const route of routes) {
         this.app.use(route.path, route.middleware, route.handler);
       }

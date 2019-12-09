@@ -5,7 +5,6 @@ import { MysqlConnectionOptions } from "typeorm/driver/mysql/MysqlConnectionOpti
 export async function connectDB(
   entity?: string
 ): Promise<Connection | undefined> {
-  console.log(__dirname);
   const options: MysqlConnectionOptions = {
     type: "mysql",
     host: CONFIG.DB_HOST,
