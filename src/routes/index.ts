@@ -18,16 +18,7 @@ interface IRoute {
 export const routes: IRoute[] = [
   {
     path: "/",
-    handler: Router().get("/", async (req, res) => {
-      try {
-        const connection = await connectDB();
-        console.log(connection);
-        res.json("Hi mundosss");
-      } catch (error) {
-        console.log(error);
-        res.json("No se conecto :(");
-      }
-    }),
+    handler: Router().get("/", async (req, res) => res.json("Hi mundosss")),
     middleware: []
   },
   {

@@ -27,8 +27,7 @@ export class Server {
   public async start(): Promise<http.Server | undefined> {
     try {
       this.initExpressApp();
-      console.log(CONFIG);
-      // this.connection = await connectDB();
+      this.connection = await connectDB();
       for (const route of routes) {
         this.app.use(route.path, route.middleware, route.handler);
       }
