@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Home Feed API",
+      "name": "Torres API",
       "program": "${workspaceFolder}\\dist\\index.js",
       "preLaunchTask": "watch",
       "envFile": "${workspaceFolder}/.env",

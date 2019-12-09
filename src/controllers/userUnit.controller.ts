@@ -13,6 +13,18 @@ export class UserUnitController {
     }
   }
 
+  static async addUserWithCode(req: Request, res: Response) {
+    try {
+      const useUnit = await UnitService.addUserWithCode(
+        req.params.id,
+        req.params.code
+      );
+      HttpResponse.success(res, useUnit);
+    } catch (error) {
+      HttpResponse.fail(res, 400, 10001, JSON.stringify(error));
+    }
+  }
+
   static async changeUserPermission(req: Request, res: Response) {
     try {
       const unit = await UnitService.changeUserPermission(

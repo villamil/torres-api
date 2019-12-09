@@ -166,6 +166,7 @@ export class UnitService {
     isOwner: boolean
   ): Promise<Unit> {
     const manager = getManager();
+    const repository = getRepository(UserUnit);
     const unit = await UnitService.getById(unitId);
 
     if (!unit) {
@@ -178,14 +179,36 @@ export class UnitService {
       throw new Error(`User ${userId} doesn't exists`);
     }
 
-    const userUnit = new UserUnit();
-    userUnit.unit = unit;
-    userUnit.user = user;
-    userUnit.isOwner = isOwner;
+    const userUnit = await repository.findOne({
+      where: {
+        unit: unitId,
+        user: userId,
+        deleted: false
+      }
+    });
 
-    await manager.save(userUnit);
+    if (userUnit) {
+      throw new Error(`User ${userId} already register with unit ${unitId}`);
+    }
+
+    const newUserUnit = new UserUnit();
+    newUserUnit.unit = unit;
+    newUserUnit.user = user;
+    newUserUnit.isOwner = isOwner;
+
+    await manager.save(newUserUnit);
 
     return unit;
+  }
+
+  static async addUserWithCode(userId: string, code: string): Promise<Unit> {
+    const unit = await UnitService.getByCode(code);
+
+    if (!unit) {
+      throw new Error(`Unit with code ${code} doesn't exists`);
+    }
+
+    return UnitService.addUser(unit.id, userId, unit.ownerCode === code);
   }
 
   static async deleteUnit(id: string): Promise<Unit> {
