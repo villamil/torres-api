@@ -7,6 +7,7 @@ import { codeRoute } from "./code.route";
 import { authRoute } from "./auth.route";
 import { userUnitRoute } from "./userUnit.route";
 import { workerRoute } from "./worker.route";
+import { connectDB } from "../db";
 
 interface IRoute {
   path: string;
@@ -17,7 +18,15 @@ interface IRoute {
 export const routes: IRoute[] = [
   {
     path: "/",
-    handler: Router().get("/", (req, res) => res.json("Hi mundosss")),
+    handler: Router().get("/", async (req, res) => {
+      try {
+        const connection = await connectDB();
+        console.log(connection);
+        res.json("Hi mundosss");
+      } catch (error) {
+        res.json("No se conecto :(");
+      }
+    }),
     middleware: []
   },
   {
