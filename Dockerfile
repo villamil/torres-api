@@ -15,7 +15,7 @@ RUN tsc -p .
 
 #################################################
 
-FROM node:10.9.0-alpine
+FROM node:10.9.0
 ENV PORT=8080
 
 WORKDIR /server
