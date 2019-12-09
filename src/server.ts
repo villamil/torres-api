@@ -32,7 +32,7 @@ export class Server {
       }
       return this.server;
     } catch (error) {
-      throw error;
+      console.log(error);
     }
   }
 
