@@ -15,7 +15,7 @@ RUN tsc -p .
 
 #################################################
 
-FROM node:10.9.0
+FROM node:10.9.0-alpine
 ENV PORT=8080
 
 WORKDIR /server
@@ -23,7 +23,7 @@ WORKDIR /server
 COPY package.json .
 COPY package-lock.json .
 
-# RUN apk --no-cache add --virtual builds-deps build-base python
+RUN apk --no-cache add --virtual builds-deps build-base python
 
 RUN npm install
 
