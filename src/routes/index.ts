@@ -24,6 +24,7 @@ export const routes: IRoute[] = [
         console.log(connection);
         res.json("Hi mundosss");
       } catch (error) {
+        console.log(error);
         res.json("No se conecto :(");
       }
     }),
