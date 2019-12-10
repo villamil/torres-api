@@ -11,5 +11,6 @@ export const CONFIG = {
   JWT_ISS: process.env.JWT_ISS || "Torres",
   JWT_PRIVATE_KEY: process.env.JWT_PRIVATE_KEY || "",
   JWT_PUBLIC_KEY: process.env.JWT_PUBLIC_KEY || "",
-  JWT_AUDIENCE: process.env.JWT_AUDIENCE || "http://localhost"
+  JWT_AUDIENCE: process.env.JWT_AUDIENCE || "http://localhost",
+  JWT_ALGORITHM: process.env.JWT_ALGORITHM || "RS256"
 };

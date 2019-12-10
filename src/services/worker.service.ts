@@ -15,7 +15,7 @@ export class WorkerService {
         schema: section.maintenanceSchema,
         transformData: section.maintenanceFormatData
       });
-
+      console.log(resultMaintenance);
       await this.updateMaintenance(resultMaintenance, section);
       const resultWater = await readXlsxFile(buffer, {
         sheet: section.waterSheet,
@@ -92,7 +92,7 @@ export class WorkerService {
   }
 
   private static maintenanceSchema = {
-    Dpto: {
+    "Dpto.": {
       prop: "number",
       type: String
     },
@@ -344,7 +344,8 @@ export class WorkerService {
 
   private static maintenanceFormatData(data) {
     data.shift();
-    data[0] = data[0].map(item => (item ? item.replace("\r\n", "") : null));
+    data[0] = data[0].map(item => (item ? item.split("\n").join("") : null));
+    console.log(data);
     return data;
   }
 
@@ -356,14 +357,7 @@ export class WorkerService {
       "\r\nPagos": "Pagos",
       "\r\nConsumo": "Consumo"
     };
-    data[0] = data[0].map(item =>
-      item
-        ? item.replace(
-            /\r\n|\r\nPagos|\r\nConsumo/gi,
-            matched => replaceObj[matched]
-          )
-        : null
-    );
+    data[0] = data[0].map(item => (item ? item.split("\n").join("") : null));
     return data;
   }
 }

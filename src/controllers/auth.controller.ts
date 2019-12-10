@@ -1,13 +1,15 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import passport from "passport";
+
 import { HttpResponse } from "../utils/httpResponse";
 
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
 
 export class AuthController {
-  static async authenticate(req: Request, res: Response) {
+  static async authenticate(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await AuthService.authenticate(
+      const user = await AuthService.validateUser(
         req.body.email,
         req.body.password
       );

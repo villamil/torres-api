@@ -13,27 +13,7 @@ export class TestData {
     const units = [
       {
         userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
-        unitId: "a1d24b54-d02c-47a6-a313-c3081ba11e02",
-        isAdmin: true
-      },
-      {
-        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
-        unitId: "75b83c2a-ad39-42db-961a-b575a1bc49f5",
-        isAdmin: true
-      },
-      {
-        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
-        unitId: "d6fd8e42-ac6c-4a40-bb0f-f1de510f0a61",
-        isAdmin: true
-      },
-      {
-        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
-        unitId: "9e94f2be-4657-4171-9688-169a0eecdac4",
-        isAdmin: true
-      },
-      {
-        userId: "5edc6016-e634-49be-a98e-c6db7edd1fbb",
-        unitId: "4f055ce4-d656-4f76-a573-f90496a58c8e",
+        unitId: "71ea6d04-53a4-42fd-b1a7-af2c6cc1b336",
         isAdmin: true
       }
     ];

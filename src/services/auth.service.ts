@@ -7,7 +7,7 @@ import { CONFIG } from "../config";
 import { UserService } from "./user.service";
 
 export class AuthService {
-  static async authenticate(email: string, password: string) {
+  static async validateUser(email: string, password: string) {
     const user = await UserService.getByEmail(email);
     if (!user) {
       throw new Error("User doesn't exist");

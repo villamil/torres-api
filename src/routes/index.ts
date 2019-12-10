@@ -7,7 +7,8 @@ import { codeRoute } from "./code.route";
 import { authRoute } from "./auth.route";
 import { userUnitRoute } from "./userUnit.route";
 import { workerRoute } from "./worker.route";
-import { connectDB } from "../db";
+
+import * as MiddleWares from "./middlewares";
 
 interface IRoute {
   path: string;

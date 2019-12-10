@@ -6,8 +6,10 @@ import { Connection } from "typeorm";
 import bodyParser from "body-parser";
 import * as WebSocket from "ws";
 import fileupload from "express-fileupload";
+import passport from "passport";
 
 import { routes } from "./routes";
+import { PassportConfig } from "./passport-config";
 import { ErrorHandling } from "./controllers/errorHandling.controller";
 import { connectDB } from "./db";
 import { CONFIG } from "./config";
@@ -38,6 +40,9 @@ export class Server {
   }
 
   private initExpressApp(): void {
+    this.app.use(passport.initialize());
+    PassportConfig.init(passport);
+
     this.app.use(
       fileupload({
         useTempFiles: true,
