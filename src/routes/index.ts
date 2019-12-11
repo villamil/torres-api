@@ -30,7 +30,7 @@ export const routes: IRoute[] = [
   {
     path: "/users",
     handler: userRoute,
-    middleware: []
+    middleware: [MiddleWares.authenticateJWT]
   },
   {
     path: "/worker",

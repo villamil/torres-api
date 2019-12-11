@@ -24,10 +24,8 @@ export function authenticateJWT(
       } else if (error) {
         return next(error);
       } else {
+        req.user = user;
         return next();
-        // if (req.headers.authorization) {
-        //   const token = req.headers.authorization.substring(4);
-        // }
       }
     }
   )(req, res, next);

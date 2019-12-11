@@ -31,13 +31,14 @@ export class AuthService {
       expiresIn: CONFIG.JWT_EXPIRATION,
       issuer: CONFIG.JWT_ISS,
       audience: CONFIG.JWT_AUDIENCE,
-      subject
+      subject,
+      algorithm: "RS256"
     };
 
     return jwt.sign(payload, PRIVATE_KEY, options);
   }
 
-  static verifyToken(token: string): Promise<any> {
+  static verifyToken(token: string): string | object {
     const PUBLIC_KEY = fs
       .readFileSync(
         path.join(__dirname, "../../", CONFIG.JWT_PRIVATE_KEY),
