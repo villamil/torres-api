@@ -40,12 +40,12 @@ export const routes: IRoute[] = [
   {
     path: "/user-unit",
     handler: userUnitRoute,
-    middleware: []
+    middleware: [MiddleWares.authenticateJWT]
   },
   {
     path: "/units",
     handler: unitRoute,
-    middleware: []
+    middleware: [MiddleWares.authenticateJWT]
   },
   {
     path: "/codes",
@@ -55,11 +55,11 @@ export const routes: IRoute[] = [
   {
     path: "/maintenance",
     handler: maintenanceRoute,
-    middleware: []
+    middleware: [MiddleWares.authenticateJWT]
   },
   {
     path: "/water",
     handler: waterRoute,
-    middleware: []
+    middleware: [MiddleWares.authenticateJWT]
   }
 ];
