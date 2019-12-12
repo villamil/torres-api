@@ -11,7 +11,9 @@
         "curly": false,
         "ordered-imports": false,
         "member-access": false,
-        "arrow-parens": false
+        "arrow-parens": false,
+        "object-literal-key-quotes": false,
+        "quotemark": false
     },
     "rulesDirectory": []
 }

@@ -17,10 +17,10 @@ export abstract class ServiceBase extends BaseEntity {
   @Column()
   year!: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: "double" })
   dueAmount!: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: "double" })
   paidAmount!: number;
 
   @Column()

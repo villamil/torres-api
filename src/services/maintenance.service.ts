@@ -1,8 +1,8 @@
-import { getManager, getRepository, In } from "typeorm";
+import { getManager, getRepository, In } from 'typeorm';
 
-import { Maintenance } from "../models/Maintenance.model";
-import { Unit } from "../models/Unit.model";
-import { UnitService } from "./unit.service";
+import { Maintenance } from '../models/Maintenance.model';
+import { Unit } from '../models/Unit.model';
+import { UnitService } from './unit.service';
 
 interface ICreateMaintenanceData {
   month: number;
@@ -51,13 +51,14 @@ export class MaintenanceService {
         month: data.month,
         year: data.year,
         unit: data.unitId,
-        deleted: false
-      }
+        deleted: false,
+      },
     });
 
     if (maintenanceByDate) {
       maintenanceByDate.paid = data.paid;
       maintenanceByDate.paidAmount = data.paidAmount;
+      maintenanceByDate.dueAmount = data.dueAmount;
       return manager.save(maintenanceByDate);
     }
 
@@ -67,9 +68,9 @@ export class MaintenanceService {
   static getAll(): Promise<Maintenance[]> {
     return getRepository(Maintenance).find({
       where: {
-        deleted: false
+        deleted: false,
       },
-      relations: ["unit"]
+      relations: ['unit'],
     });
   }
 
@@ -77,9 +78,9 @@ export class MaintenanceService {
     return getRepository(Maintenance).findOne({
       where: {
         id,
-        deleted: false
+        deleted: false,
       },
-      relations: ["unit"]
+      relations: ['unit'],
     });
   }
 
@@ -92,8 +93,8 @@ export class MaintenanceService {
     const maintenance: Maintenance = await repository.findOne({
       where: {
         id,
-        deleted: false
-      }
+        deleted: false,
+      },
     });
 
     if (!maintenance) {
@@ -110,8 +111,8 @@ export class MaintenanceService {
       const unit: Unit = await getRepository(Unit).findOne({
         where: {
           id: data.unitId,
-          deleted: false
-        }
+          deleted: false,
+        },
       });
 
       if (!unit) {
@@ -129,8 +130,8 @@ export class MaintenanceService {
     const maintenance: Maintenance = await repository.findOne({
       where: {
         id,
-        deleted: false
-      }
+        deleted: false,
+      },
     });
     if (maintenance) {
       maintenance.deleted = true;
@@ -142,7 +143,7 @@ export class MaintenanceService {
 
   static async findByIdRange(ids: string[]): Promise<Maintenance[]> {
     return getRepository(Maintenance).find({
-      id: In(ids)
+      id: In(ids),
     });
   }
 
@@ -150,8 +151,8 @@ export class MaintenanceService {
     const maintenance = await getRepository(Maintenance).find({
       where: {
         unit: unitId,
-        deleted: false
-      }
+        deleted: false,
+      },
     });
 
     const totalDueAndPaidAmount = maintenance.reduce(
@@ -173,11 +174,11 @@ export class MaintenanceService {
     const baseQuery: any = {
       where: {
         unit: unitId,
-        deleted: false
+        deleted: false,
       },
       order: {
-        month: "DESC"
-      }
+        month: 'DESC',
+      },
     };
     if (limit) {
       baseQuery.take = limit;

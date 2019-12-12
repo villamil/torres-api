@@ -7,6 +7,14 @@ import { WaterService } from "./water.service";
 
 import readXlsxFile from "read-excel-file/node";
 
+function parse(value) {
+  const parsedValue = Number(value);
+  if (isNaN(parsedValue)) {
+    throw new Error("Invalid number");
+  }
+  return parsedValue;
+}
+
 export class WorkerService {
   static async readFile(buffer, year) {
     for (const section of WorkerService.sections) {
@@ -21,9 +29,7 @@ export class WorkerService {
         schema: section.waterSchema,
         transformData: section.waterTransformData
       });
-      if (section.type === "B") {
-        // console.log(resultWater);
-      }
+
       await this.updateWater(resultWater, section, year);
     }
   }
@@ -35,19 +41,49 @@ export class WorkerService {
           if (!isNaN(row.number)) {
             const unit = await UnitService.createUnit({
               ...row,
-              section: section.type
+              section: section.type,
+              ownerCode: row.code
             });
             if (unit.id) {
               const currentMonth = Number(moment().format("MM"));
               for (let month = 1; month <= currentMonth; month++) {
-                await MaintenanceService.createMaintenance({
-                  month,
-                  year,
-                  dueAmount: section.maintenanceBaseAmount,
-                  paidAmount: row[month] || 0,
-                  paid: row[month] >= section.maintenanceBaseAmount,
-                  unitId: unit.id
-                });
+                if (month === 1) {
+                  await MaintenanceService.createMaintenance({
+                    month,
+                    year,
+                    dueAmount:
+                      Math.sign(row.previousYearOwed) === -1
+                        ? section.maintenanceBaseAmount +
+                          Math.abs(row.previousYearOwed)
+                        : section.maintenanceBaseAmount,
+                    paidAmount:
+                      Math.sign(row.previousYearOwed) === 1
+                        ? (row[month] || 0) + row.previousYearOwed
+                        : row[month] || 0,
+                    paid: row[month] >= section.maintenanceBaseAmount,
+                    unitId: unit.id
+                  });
+                } else if (month === 12) {
+                  await MaintenanceService.createMaintenance({
+                    month,
+                    year,
+                    dueAmount: section.maintenanceBaseAmount + 840,
+                    paidAmount: row.extraAmount
+                      ? (row[month] || 0) + row.extraAmount
+                      : row[month] || 0,
+                    paid: row[month] >= section.maintenanceBaseAmount,
+                    unitId: unit.id
+                  });
+                } else {
+                  await MaintenanceService.createMaintenance({
+                    month,
+                    year,
+                    dueAmount: section.maintenanceBaseAmount,
+                    paidAmount: row[month] || 0,
+                    paid: row[month] >= section.maintenanceBaseAmount,
+                    unitId: unit.id
+                  });
+                }
               }
             }
           }
@@ -63,12 +99,13 @@ export class WorkerService {
   static async updateWater(water, section, year) {
     return new Promise(async (resolve, reject) => {
       try {
-        // console.log(water.rows);
+        console.log(water.rows);
         for (const row of water.rows) {
           if (!isNaN(row.number)) {
             const unit = await UnitService.createUnit({
               ...row,
-              section: section.type
+              section: section.type,
+              ownerCode: row.code
             });
             if (unit.id) {
               let previouslyOwed = 0;
@@ -78,15 +115,16 @@ export class WorkerService {
                 previouslyOwed = due - paid;
               }
               const currentMonth = Number(moment().format("MM"));
-              for (let month = 1; month <= currentMonth - 1; month++) {
+              for (let month = 1; month <= currentMonth; month++) {
                 if (month === 1) {
                   const { paidAmount = 0, dueAmount = 0 } = row[month] || {};
                   await WaterService.createWater({
                     month,
                     year,
                     dueAmount: previouslyOwed + dueAmount,
-                    paidAmount: paidAmount || 0,
-                    paid: paidAmount >= previouslyOwed + dueAmount,
+                    paidAmount:
+                      (paidAmount || 0) + (row[month + 1].paidAmount || 0),
+                    paid: paidAmount + dueAmount >= previouslyOwed,
                     unitId: unit.id
                   });
                 } else {
@@ -122,52 +160,64 @@ export class WorkerService {
       prop: "reference",
       type: String
     },
-    "2019 ENERO": {
+    CODIGO: {
+      prop: "code",
+      type: String
+    },
+    "Saldo MTTal 1 ENE 2019": {
+      prop: "previousYearOwed",
+      type: String
+    },
+    "2019ENERO": {
       prop: "1",
       type: String
     },
-    "2019 FEBRERO": {
+    "2019FEBRERO": {
       prop: "2",
       type: String
     },
-    "2019 MARZO": {
+    "2019MARZO": {
       prop: "3",
       type: String
     },
-    "2019 ABRIL": {
+    "2019ABRIL": {
       prop: "4",
       type: String
     },
-    "2019 MAYO": {
+    "2019MAYO": {
       prop: "5",
       type: String
     },
-    "2019 JUNIO": {
+    "2019JUNIO": {
       prop: "6",
       type: String
     },
-    "2019 JULIO": {
+    "2019JULIO": {
       prop: "7",
       type: String
     },
-    "2019 AGOSTO": {
+    "2019AGOSTO": {
       prop: "8",
       type: String
     },
-    "2019 SEPT": {
+    "2019SEPT": {
       prop: "9",
       type: String
     },
-    "2019 OCTUBRE": {
+    "2019OCTUBRE": {
       prop: "10",
       type: String
     },
-    "2019 NOV.": {
+    "2019NOV.": {
       prop: "11",
       type: String
     },
-    "2019 DIC.": {
+    "2019DIC.": {
       prop: "12",
+      type: String
+    },
+    "CUOTA EXT 2019": {
+      prop: "extraAmount",
       type: String
     }
   };
@@ -203,11 +253,13 @@ export class WorkerService {
       type: {
         ENE2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         ENE2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -216,11 +268,13 @@ export class WorkerService {
       type: {
         FEB2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         FEB2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -229,11 +283,13 @@ export class WorkerService {
       type: {
         MAR2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         MAR2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -242,11 +298,13 @@ export class WorkerService {
       type: {
         ABR2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         ABR2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -255,11 +313,13 @@ export class WorkerService {
       type: {
         MAY2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         MAY2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -268,11 +328,13 @@ export class WorkerService {
       type: {
         JUN2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         JUN2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -281,11 +343,13 @@ export class WorkerService {
       type: {
         JUL2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         JUL2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -294,11 +358,13 @@ export class WorkerService {
       type: {
         AGO2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         AGO2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -307,11 +373,13 @@ export class WorkerService {
       type: {
         SEPT2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         SEPT2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -320,11 +388,13 @@ export class WorkerService {
       type: {
         OCT2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         OCT2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -333,11 +403,13 @@ export class WorkerService {
       type: {
         "NOV.2019Pagos": {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         "NOV.2019Consumo": {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     },
@@ -346,11 +418,13 @@ export class WorkerService {
       type: {
         DIC2019Pagos: {
           prop: "paidAmount",
-          type: String
+          type: Number,
+          parse
         },
         DIC2019Consumo: {
           prop: "dueAmount",
-          type: String
+          type: Number,
+          parse
         }
       }
     }
@@ -383,8 +457,17 @@ export class WorkerService {
 
   private static maintenanceFormatData(data) {
     data.shift();
-    data[0] = data[0].map(item => (item ? item.split("\n").join("") : null));
-    console.log(data);
+    data[0] = data[0].map(item =>
+      item
+        ? item
+            .split("\n")
+            .map(word => word.trim())
+            .join("")
+            .split("\r")
+            .map(word => word.trim())
+            .join("")
+        : null
+    );
     return data;
   }
 
@@ -395,6 +478,9 @@ export class WorkerService {
       item
         ? item
             .split("\n")
+            .map(word => word.trim())
+            .join("")
+            .split("\r")
             .map(word => word.trim())
             .join("")
         : null
