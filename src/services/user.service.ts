@@ -56,7 +56,7 @@ export class UserService {
 
       userUnit.unit = unit;
       userUnit.user = newUser;
-      userUnit.isOwner = unit.ownerCode === data.code;
+      userUnit.isOwner = unit.ownerCode === data.code.toUpperCase();
 
       await manager.save(userUnit);
 
