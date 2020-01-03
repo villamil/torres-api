@@ -4,26 +4,38 @@ jobs:
  buildx:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v1
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
+      - name: Publish changed images
+        uses: dawidd6/action-docker-publish-changed@master
         with:
-          version: latest
-      -
-        name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
-      -
-        name: Run Buildx
-        run: |
-          docker buildx build --platform linux/arm/v7 --file pi.Dockerfile .
-      - uses: actions/checkout@master
-      - name: Publish to Docker Repository
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: villamil350/torres-api:pi
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          docker_username: ${{secrets.DOCKER_USERNAME}}
+          docker_password: ${{secrets.DOCKER_PASSWORD}}
+          # github_token: ${{secrets.GITHUB_TOKEN}}
+          platforms: linux/arm/v7
+          tag: pi
+
+      # -
+      #   name: Checkout
+      #   uses: actions/checkout@v1
+      # -
+      #   name: Set up Docker Buildx
+      #   id: buildx
+      #   uses: crazy-max/ghaction-docker-buildx@v1
+      #   with:
+      #     version: latest
+      # -
+      #   name: Available platforms
+      #   run: echo ${{ steps.buildx.outputs.platforms }}
+      # -
+      #   name: Run Buildx
+      #   run: |
+      #     docker buildx build --platform linux/arm/v7 --file pi.Dockerfile .
+      # - uses: actions/checkout@master
+      # - name: Publish to Docker Repository
+      #   uses: elgohr/Publish-Docker-Github-Action@master
+      #   with:
+      #     name: villamil350/torres-api:pi
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      #     dockerfile: pi.Dockerfile
