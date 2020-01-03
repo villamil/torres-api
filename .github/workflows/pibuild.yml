@@ -1,5 +1,10 @@
 name: Buildx and Publish
-on: [push]
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - './pi.Dockerfile'
 jobs:
  buildx:
     runs-on: ubuntu-latest
