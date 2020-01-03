@@ -11,7 +11,7 @@ jobs:
         with:
           docker_username: ${{secrets.DOCKER_USERNAME}}
           docker_password: ${{secrets.DOCKER_PASSWORD}}
-          # github_token: ${{secrets.GITHUB_TOKEN}}
+          github_token: ${{secrets.TOKEN}}
           platforms: linux/arm/v7
           tag: pi
 
