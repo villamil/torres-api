@@ -12,7 +12,7 @@ jobs:
           docker_username: ${{secrets.DOCKER_USERNAME}}
           docker_password: ${{secrets.DOCKER_PASSWORD}}
           github_token: ${{secrets.TOKEN}}
-          platforms: linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/arm
           tag: pi
 
       # -
