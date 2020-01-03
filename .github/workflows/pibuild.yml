@@ -19,7 +19,7 @@ jobs:
       -
         name: Run Buildx
         run: |
-          docker buildx build --platform build linux/arm/v7 .
+          docker buildx build --platform linux/arm/v7 .
       - uses: actions/checkout@master
       - name: Publish to Docker Repository
         uses: elgohr/Publish-Docker-Github-Action@master
