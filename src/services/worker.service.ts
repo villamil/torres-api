@@ -46,7 +46,7 @@ export class WorkerService {
             });
             if (unit.id) {
               const currentMonth = Number(moment().format("MM"));
-              for (let month = 1; month <= currentMonth; month++) {
+              for (let month = 1; month <= 12; month++) {
                 if (month === 1) {
                   await MaintenanceService.createMaintenance({
                     month,
@@ -115,7 +115,7 @@ export class WorkerService {
                 previouslyOwed = due - paid;
               }
               const currentMonth = Number(moment().format("MM"));
-              for (let month = 1; month <= currentMonth; month++) {
+              for (let month = 1; month <= 12; month++) {
                 if (month === 1) {
                   const { paidAmount = 0, dueAmount = 0 } = row[month] || {};
                   await WaterService.createWater({
