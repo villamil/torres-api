@@ -34,7 +34,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "read-excel-file": "^4.0.5",
+    "read-excel-file": "^5.5.0",
     "typeorm": "^0.2.20",
     "uuid": "^3.3.3",
     "ws": "^7.2.0"
